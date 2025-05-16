@@ -29,6 +29,8 @@
             margin: 2rem auto;
             padding: 0 1rem;
             background: #f8f9fa;
+            /* 使用 vw 单位设置字体大小 */
+            font-size: 4vw; /* 根据视口宽度缩放字体大小，可以根据需要调整数值 */
         }
         .container {
             background: white;
@@ -43,16 +45,25 @@
             /* 适应小屏幕，允许换行 */
             flex-wrap: wrap;
         }
+        /* 文本域样式 */
         #promptInput {
             flex: 1;
             padding: 12px 16px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 1em; /* 恢复使用 em，以便与 body 的 font-size 联动 */
             transition: border-color 0.3s;
-            /* 防止输入框内容超出 */
             min-width: 0;
+            /* 允许垂直调整大小 */
+            resize: vertical;
+            /* 设置最小高度 */
+            min-height: 100px;
+            /* 自动换行 */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto; /* 必要时显示滚动条 */
         }
+
         #promptInput:focus {
             border-color: var(--primary);
             outline: none;
@@ -118,6 +129,7 @@
             body {
                 padding: 0 0.5rem; /* 缩小内边距 */
                 margin: 1rem auto; /* 缩小外边距 */
+                font-size: 5vw; /* 在小屏幕上稍微增大字体 */
             }
             .container {
                 padding: 1rem; /* 缩小容器内边距 */
@@ -126,12 +138,13 @@
                 gap: 0.5rem; /* 缩小间距 */
             }
             #promptInput {
-                padding: 8px 12px; /* 缩小输入框内边距 */
-                font-size: 14px; /* 缩小字体 */
+                padding: 8px 12px; /* 缩小文本域内边距 */
+                font-size: 0.9em; /* 字体与 body 联动 */
+                min-height: 80px;
             }
             button {
                 padding: 8px 16px; /* 缩小按钮内边距 */
-                font-size: 14px; /* 缩小字体 */
+                font-size: 0.9em; /* 字体与 body 联动 */
             }
         }
     </style>
@@ -140,10 +153,9 @@
     <div class="container">
         <h1>🎨 风清扬智能绘画</h1>
         <div class="input-group">
-            <input type="text"
-                   id="promptInput"
-                   placeholder="输入绘画描述（例如：山间桃花环绕的亭子）"
-                   autocomplete="off">
+            <textarea id="promptInput"
+                      placeholder="输入绘画描述（例如：山间桃花环绕的亭子）"
+                      autocomplete="off"></textarea>
             <button onclick="generateImage()">立即生成</button>
         </div>
         <div class="result-area">
@@ -184,9 +196,18 @@
                 if (!prompt) throw new Error('请输入有效的描述内容');
 
                 let finalPrompt = prompt;
+                let translated = false; // 标记是否进行了翻译
+
                 // 如果是PC端，则翻译为英文
                 if (!isMobileDevice()) {
-                    finalPrompt = await translateToEnglish(prompt);
+                    try {
+                        finalPrompt = await translateToEnglish(prompt);
+                        translated = true; // 标记已翻译
+                    } catch (err) {
+                        //  只有在尝试翻译 *并且* 翻译失败时才显示错误
+                        showError("翻译服务暂时不可用，请尝试英文");
+                        return; // 停止生成图像
+                    }
                 }
 
                 // 构建API请求（可选使用CORS代理）
@@ -258,9 +279,12 @@
             loading.style.display = 'none';
         }
 
-        // 回车键支持
-        document.getElementById('promptInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') generateImage();
+        // 回车键支持 (仅在PC端生效，移动端通常有自己的换行方式)
+        document.getElementById('promptInput').addEventListener('keydown', (e) => {
+             if (!isMobileDevice() && e.key === 'Enter' && !e.shiftKey) { // Shift + Enter 换行
+                generateImage();
+                e.preventDefault(); // 阻止默认行为，避免换行
+             }
         });
 
         // 静默翻译（中→英）
@@ -273,8 +297,7 @@
                 return data[0][0][0]; // 提取翻译结果
             } catch (err) {
                 console.error("翻译出错:", err);
-                showError("翻译服务暂时不可用，请尝试英文");
-                return text;  // 翻译失败则使用原始文本
+                throw err;  // 抛出异常，让 generateImage 函数捕获
             }
         }
 
