@@ -29,9 +29,18 @@
             margin: 2rem auto;
             padding: 0 1rem;
             background: #f8f9fa;
-            /* 使用 vw 单位设置字体大小 */
-            font-size: 4vw; /* 根据视口宽度缩放字体大小，可以根据需要调整数值 */
+            /* PC 端默认字体大小 */
+            font-size: 16px;
         }
+
+        /* 媒体查询：移动端字体自适应 */
+        @media (max-width: 768px) {
+            body {
+                /* 移动端使用 vw 单位设置字体大小 */
+                font-size: 4vw; /* 根据视口宽度缩放字体大小，可以根据需要调整数值 */
+            }
+        }
+
         .container {
             background: white;
             border-radius: 12px;
@@ -50,8 +59,8 @@
             flex: 1;
             padding: 12px 16px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1em; /* 恢复使用 em，以便与 body 的 font-size 联动 */
+            /* 恢复使用 em，以便与 body 的 font-size 联动 */
+            font-size: 1em;
             transition: border-color 0.3s;
             min-width: 0;
             /* 允许垂直调整大小 */
@@ -129,7 +138,8 @@
             body {
                 padding: 0 0.5rem; /* 缩小内边距 */
                 margin: 1rem auto; /* 缩小外边距 */
-                font-size: 5vw; /* 在小屏幕上稍微增大字体 */
+                /* 移动端小屏幕上稍微增大字体 */
+                font-size: 5vw;
             }
             .container {
                 padding: 1rem; /* 缩小容器内边距 */
@@ -154,7 +164,7 @@
         <h1>🎨 风清扬智能绘画</h1>
         <div class="input-group">
             <textarea id="promptInput"
-                      placeholder="PC端可以中文也可以英文，移动端请输入英文"
+                      placeholder="PC端可中文可英文，移动端只能英文"
                       autocomplete="off"></textarea>
             <button onclick="generateImage()">生成</button>
         </div>
