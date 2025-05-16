@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>🎨风清扬智能绘画</title>
-    
+    <title>🎨 风清扬智能绘画</title>
+   
     <!--  Favicon  -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png">
@@ -12,7 +12,7 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
-          
+    
     <style>
         :root {
             --primary: #2d8cf0;
@@ -67,7 +67,7 @@
             margin-top: 1.5rem;
         }
         #loading {
-            display: none;
+            display: none; /* 初始隐藏 */
             position: absolute;
             top: 50%;
             left: 50%;
@@ -110,8 +110,8 @@
     <div class="container">
         <h1>🎨 风清扬智能绘画</h1>
         <div class="input-group">
-            <input type="text"
-                   id="promptInput"
+            <input type="text" 
+                   id="promptInput" 
                    placeholder="输入绘画描述（例如：山间桃花环绕的亭子）"
                    autocomplete="off">
             <button onclick="generateImage()">立即生成</button>
@@ -128,15 +128,14 @@
     </div>
 
     <script>
-!function(){var t=function(t){for(var e=t+"=",n=document.cookie.split(";"),r=0;r<n.length;r++){for(var i=n[r];" "==i.charAt(0);)i=i.substring(1,i.length);if(0==i.indexOf(e))return i.substring(e.length,i.length)}return null},e=function(t,e,n){var r=new Date;r.setDate(r.getDate()+n);var i="expires="+r.toUTCString();document.cookie=t+"="+e+";"+i+";path=/"},n=function(t,e){return(t=(t=String(t)).split("."))[0].length>e?t[0].slice(0,e)+"."+t[0].slice(e):t[0]},r=function(t){return(t=t.toString()).replace(/[^\w]/gi,"")},i=function(t){for(var e=window.location.host,n=e.split("."),r=n.length,i="."+n[r-1],o=1;o<r;o++)if(-1!=document.domain.indexOf(i=n[r-o-1]+i))return document.domain;return e};!function(){function o(e){if(!t("locstorcheck"))try{var n=window.localStorage;n.setItem("locstorcheck","test"),n.removeItem("locstorcheck"),o=1}catch(t){o=2;console.warn("Could not use localStorage. Error was:",t)}switch(o){case 1:try{n.setItem(e,"1"),n.removeItem(e),o=1}catch(t){o=2;console.warn("localStorage maxed out. localStorage not being utilized")}break;case 2:console.warn("localStorage not supported. Falling back to cookie fallback")}(function(){var e={setItem:function(t,e){return localStorage.setItem(t,e)},getItem:function(t){return localStorage.getItem(t)},removeItem:function(t){return localStorage.removeItem(t)}},r=window.localStorage;try{r.setItem("testStorage","test"),r.removeItem("testStorage"),o=1}catch(t){o=2;console.warn("Could not use localStorage. Error was:",t),e={setItem:function(e,n){return t(e,n,1)},getItem:function(e){return t(e)},removeItem:function(e){return document.cookie=e+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"}}}(),window.storage=e)}var a=function(){var t=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;try{document.createEvent("TouchEvent"),a=1}catch(t){a=2}return a},c=function(t){return new Promise(function(e,n){var r=new XMLHttpRequest;r.open("GET",t),r.responseType="json",r.onload=function(){200===r.status?e(r.response):n(new Error("Request failed.  Returned status of "+r.status))},r.onerror=function(){n(new Error("There was a network error."))},r.send()})},u=function(){var e=/Android/i.test(navigator.userAgent);try{u=e?1:2}catch(t){u=3}return u};o("locstorcheck")}();
-var controller = null;
+        let controller = null;
 
         async function generateImage() {
             const prompt = document.getElementById('promptInput').value.trim();
             const loading = document.getElementById('loading');
             const imageContainer = document.getElementById('imageContainer');
             const errorMsg = document.getElementById('errorMsg');
-
+            
             // 取消进行中的请求
             if(controller) controller.abort();
             controller = new AbortController();
@@ -145,7 +144,7 @@ var controller = null;
             imageContainer.style.display = 'none';
             errorMsg.style.display = 'none';
             loading.style.display = 'flex'; // 显示加载动画
-
+            
             try {
                 if (!prompt) throw new Error('请输入有效的描述内容');
 
@@ -156,12 +155,12 @@ var controller = null;
                 const baseUrl = 'https://npi.lazy52.com/api/flux';
                 // const proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // 备用代理
                 const apiUrl = `${baseUrl}/?msg=${encodeURIComponent(translatedPrompt)}`; // 使用翻译后的提示语
-
+                
                 console.log('请求URL:', apiUrl);
                 const response = await fetch(apiUrl, {
                     signal: controller.signal
                 });
-
+                
                 console.log('响应状态:', response.status, response.statusText);
                 const contentType = response.headers.get('content-type');
                 console.log('内容类型:', contentType);
@@ -176,7 +175,7 @@ var controller = null;
                     const data = await response.json();
                     if (!data.image_url) throw new Error('API返回数据异常');
                     showImage(data.image_url);
-                }
+                } 
                 else if (contentType.startsWith('image/')) {
                     const blob = await response.blob();
                     const imgUrl = URL.createObjectURL(blob);
@@ -203,13 +202,13 @@ var controller = null;
                 URL.revokeObjectURL(img.dataset.objectUrl);
                 delete img.dataset.objectUrl;
             }
-
+            
             // 标记并设置图片源
             if(url.startsWith('blob:')) {
                 img.dataset.objectUrl = url;
             }
             img.src = url;
-
+            
             document.getElementById('imageContainer').style.display = 'block';
             loading.style.display = 'none';
         }
