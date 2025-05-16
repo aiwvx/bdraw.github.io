@@ -31,6 +31,10 @@
             background: #f8f9fa;
             /* PC 端默认字体大小 */
             font-size: 16px;
+            /* 设置 flex 布局，使内容居中 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         /* 媒体查询：移动端字体自适应 */
@@ -46,6 +50,9 @@
             border-radius: 12px;
             padding: 2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            /* 设置最大宽度，并居中 */
+            max-width: 800px;
+            width: 100%;
         }
         .input-group {
             display: flex;
@@ -93,6 +100,10 @@
             position: relative;
             min-height: 300px;
             margin-top: 1.5rem;
+            /* 确保图片显示在输入框下方 */
+            order: 2; /* 确保 result-area 在输入框之后 */
+            width: 100%; /* 撑满容器 */
+            text-align: center; /* 内部元素居中 */
         }
         #loading {
             display: none; /* 初始隐藏 */
@@ -164,7 +175,7 @@
         <h1>🎨 风清扬智能绘画</h1>
         <div class="input-group">
             <textarea id="promptInput"
-                      placeholder="PC端可中文可英文，移动端只能英文"
+                      placeholder="PC端可以中文或英文，移动端只能英文"
                       autocomplete="off"></textarea>
             <button onclick="generateImage()">生成</button>
         </div>
